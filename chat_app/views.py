@@ -2,11 +2,30 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from .models import ChatResponse
 from .serializers import ChatResponseSerializer
-import bonggoQuery
+import wolframalpha as wf
+import wikipedia
+
+
+app = wf.Client("3YEQYW-RA6A8LREGV")
+
+          
+def wikiLogic(query):
+    query = query.replace("wikipedia", "")
+    results = wikipedia.summary(query, sentences=2)
+    return results
+
 
 
 def bonggoChat(msg):
-    return bonggoQuery.Query.normal_query.printing(msg)
+    querys= msg.lower()
+    res = app.query(msg)
+    try: 
+        return f"{(next(res.results).text)}"
+    except Exception:
+        try:
+            return f"According to Wikipedia {wikiLogic(querys)}"
+        except Exception:
+             return "There is an error !"
     
 
 
